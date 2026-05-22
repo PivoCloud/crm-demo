@@ -13,13 +13,23 @@ declare global {
 }
 
 function createPool(): Pool {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
+  const raw = process.env.DATABASE_URL;
+  if (!raw) {
     throw new Error(
       "DATABASE_URL is not set. Copy .env.example to .env and configure it.",
     );
   }
-  return new Pool({ connectionString });
+  // PivoCloud managed Postgres uses an internal CA. When sslmode is requested
+  // in the URL, the pg-connection-string parser otherwise forces verify-full
+  // and overrides any ssl config — strip it and pass an explicit ssl object.
+  const needsSSL = /[?&]sslmode=(require|verify-ca|verify-full)/i.test(raw);
+  const connectionString = needsSSL
+    ? raw.replace(/([?&])sslmode=[^&]+&?/i, "$1").replace(/[?&]$/, "")
+    : raw;
+  return new Pool({
+    connectionString,
+    ssl: needsSSL ? { rejectUnauthorized: false } : undefined,
+  });
 }
 
 /**
