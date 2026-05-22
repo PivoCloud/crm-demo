@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@source not "../.planning/**/*";
+@source not "../.claude/**/*";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  --pivo-navy: #0d1320;
+  --pivo-surface: #161e2e;
+  --pivo-border: #3a4759;
+  --pivo-blue: #3b82f6;
+  --pivo-blue-hover: #2563eb;
+  --pivo-emerald: #10b981;
+
+  /* Phase 4 — dark workshop-grade surfaces (D-01) */
+  --surface-darkest: #070b14;
+  --surface-body: #0b1220;
+  --surface-raised: #111a2e;
+  --border-hairline: rgba(255,255,255,0.06);
+  --accent-cyan: #22d3ee;
+}
+
+@keyframes row-flash-dark {
+  from { background-color: rgba(34,211,238,0.08); }
+  to   { background-color: transparent; }
+}
+
+.animate-row-flash {
+  animation: row-flash-dark 1.2s ease-out forwards;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Phase 4 fige le dark indépendamment du système — le bloc media-query
+   `prefers-color-scheme: dark` de Phase 3 a été retiré pour ne plus
+   dépendre de l'OS. Le `body { background: var(--background) }` Phase 3
+   a également été retiré (il écrasait silencieusement la classe Tailwind
+   sur <body>).
+
+   On peint le fond dark sur `<html>` ET on déclare `color-scheme: dark`
+   pour que (a) la viewport entière paint dark même si <body> ne couvre
+   pas tout l'espace, et (b) les éléments natifs du browser (scrollbar,
+   form controls par défaut, autofill) suivent le thème dark. La classe
+   Tailwind `bg-[var(--surface-body)]` sur <body> dans layout.tsx reste
+   en place comme couche défensive. */
+html {
+  background-color: var(--surface-body);
+  color-scheme: dark;
+}

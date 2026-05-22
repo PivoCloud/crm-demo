@@ -1,0 +1,26 @@
+# Local dev Postgres for PivoCloud Demo.
+# Used ONLY for development; the workshop demo target is a PivoCloud
+# managed PostgreSQL instance whose DATABASE_URL is injected via .env.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pivocloud_demo_postgres
+    environment:
+      POSTGRES_USER: pivocloud
+      POSTGRES_PASSWORD: pivocloud
+      POSTGRES_DB: pivocloud_demo
+    ports:
+      - "5432:5432"
+    volumes:
+      - pivocloud_demo_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pivocloud -d pivocloud_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pivocloud_demo_pg_data:
+    name: pivocloud_demo_pg_data
